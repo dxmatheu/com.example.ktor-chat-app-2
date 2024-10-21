@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ktor WebSocket Client</title>
+</head>
+<body>
+<h1>Ktor WebSocket Chat</h1>
+<input id="messageInput" type="text" placeholder="Type a message">
+<button onclick="sendMessage()">Send</button>
+<pre id="messages"></pre>
+
+<script>
+    // Connect to the WebSocket server
+    const socket = new WebSocket("ws://localhost:8080/ws");
+
+    // Log when the WebSocket is connected
+    socket.onopen = function() {
+        console.log("Connected to the WebSocket server");
+        displayMessage("Connected to the WebSocket server");
+    };
+
+    // Receive messages from the server
+    socket.onmessage = function(event) {
+        displayMessage("Server: " + event.data);
+    };
+
+    // Log when the WebSocket is closed
+    socket.onclose = function(event) {
+        console.log("WebSocket closed: " + event.reason);
+        displayMessage("WebSocket closed: " + event.reason);
+    };
+
+    // Function to send messages to the WebSocket server
+    function sendMessage() {
+        const input = document.getElementById('messageInput');
+        const message = input.value;
+        socket.send(message);
+        displayMessage("You: " + message);
+        input.value = ''; // Clear input field after sending
+    }
+
+    // Function to display messages in the <pre> element
+    function displayMessage(message) {
+        const messages = document.getElementById('messages');
+        messages.textContent += message + '\n';
+    }
+</script>
+</body>
+</html>
