@@ -3,49 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ktor WebSocket Client</title>
+    <title>Simple Chat Test</title>
 </head>
 <body>
-<h1>Ktor WebSocket Chat</h1>
-<input id="messageInput" type="text" placeholder="Type a message">
-<button onclick="sendMessage()">Send</button>
-<pre id="messages"></pre>
+    <h3>Chat Messages</h3>
+    <div id="chatBox" style="border: 1px solid #000; height: 300px; overflow-y: auto; padding: 10px;">
+        <!-- Messages will appear here -->
+    </div>
 
-<script>
-    // Connect to the WebSocket server
-    const socket = new WebSocket("ws://localhost:8080/ws");
+    <script>
+        // Function to display a message in the chat box
+        function displayMessage(sender, message, timestamp) {
+            const chatBox = document.getElementById('chatBox');
+            const messageElement = `
+                <div>
+                    <strong>${sender}</strong>: ${message} <small>(${timestamp})</small>
+                </div>`;
+            chatBox.innerHTML += messageElement;
+        }
 
-    // Log when the WebSocket is connected
-    socket.onopen = function() {
-        console.log("Connected to the WebSocket server");
-        displayMessage("Connected to the WebSocket server");
-    };
+        // Fetch messages from the backend and populate the chat
+        function populateMessages() {
+            fetch('http://localhost:8080/messages')
+                .then(response => response.json())
+                .then(messages => {
+                    messages.forEach(msg => {
+                        let parsedMessage = msg.text;
+                        if (parsedMessage.startsWith('{')) {
+                            parsedMessage = JSON.parse(msg.text).text;
+                        }
+                        const formattedTime = new Date(msg.timestamp).toLocaleTimeString();
+                        displayMessage(msg.username, parsedMessage, formattedTime);
+                    });
+                })
+                .catch(error => console.error('Error fetching messages:', error));
+        }
 
-    // Receive messages from the server
-    socket.onmessage = function(event) {
-        displayMessage("Server: " + event.data);
-    };
-
-    // Log when the WebSocket is closed
-    socket.onclose = function(event) {
-        console.log("WebSocket closed: " + event.reason);
-        displayMessage("WebSocket closed: " + event.reason);
-    };
-
-    // Function to send messages to the WebSocket server
-    function sendMessage() {
-        const input = document.getElementById('messageInput');
-        const message = input.value;
-        socket.send(message);
-        displayMessage("You: " + message);
-        input.value = ''; // Clear input field after sending
-    }
-
-    // Function to display messages in the <pre> element
-    function displayMessage(message) {
-        const messages = document.getElementById('messages');
-        messages.textContent += message + '\n';
-    }
-</script>
+        // Call the function to populate messages when the page loads
+        window.onload = populateMessages;
+    </script>
 </body>
 </html>
