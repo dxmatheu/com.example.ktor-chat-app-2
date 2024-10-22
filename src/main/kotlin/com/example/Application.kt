@@ -1,16 +1,24 @@
 package com.example
 
+import com.example.data.dataInjectionMainModule
 import com.example.plugins.*
 import io.ktor.server.application.*
+import io.ktor.server.netty.*
+import org.koin.ktor.plugin.Koin
 
 fun main(args: Array<String>) {
-    io.ktor.server.netty.EngineMain.main(args)
+    EngineMain.main(args)
+
 }
 
+@Suppress("unused")
 fun Application.module() {
+    install(Koin){
+        modules(dataInjectionMainModule)
+    }
+    configureSockets()
+    configureRouting()
+    configureSerialization()
     configureMonitoring()
     configureSecurity()
-    configureSockets()
-    configureSerialization()
-    configureRouting()
 }
