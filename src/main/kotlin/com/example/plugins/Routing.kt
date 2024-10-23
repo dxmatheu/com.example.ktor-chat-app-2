@@ -1,8 +1,8 @@
 package com.example.plugins
 
-import com.example.data.RoomController
-import com.example.data.chatSocket
-import com.example.data.getAllMessages
+import com.example.control.RoomController
+import com.example.control.chatSocket
+import com.example.control.getAllMessages
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject

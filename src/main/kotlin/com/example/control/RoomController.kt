@@ -1,5 +1,9 @@
-package com.example.data
+package com.example.control
 
+import com.example.data.Member
+import com.example.data.MemberAlreadyExistsException
+import com.example.data.Message
+import com.example.data.MessageDataSource
 import io.ktor.websocket.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -36,11 +40,13 @@ class RoomController(
             val parsedMessage = Json.encodeToString(messageEntity)
             member.socket.send(Frame.Text(parsedMessage))
         }
-        messageDataSource.insertMessage(Message(
+        messageDataSource.insertMessage(
+            Message(
             text = message,
             username = senderUsername,
             timestamp = System.currentTimeMillis()
-        ))
+        )
+        )
     }
 
     suspend fun getAllMessages(): List<Message> {
